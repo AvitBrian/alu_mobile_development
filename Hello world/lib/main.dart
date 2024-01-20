@@ -57,7 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
             Visibility(
               visible: _toggled,
               child: Text(
-                "Hi!",
+                "Hello World!",
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
             )
