@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:get_it_done/features/navigation/screens/schedule_screen.dart';
-import 'package:get_it_done/utils/cards.dart';
+import 'package:get_it_done/features/authentication/authentication.dart';
+import 'package:get_it_done/features/navigation/widgets/new_task.dart';
+import 'package:get_it_done/features/navigation/widgets/plan_page.dart';
+import 'package:get_it_done/features/navigation/widgets/tasks_page.dart';
+import 'package:get_it_done/utils/constants.dart';
 
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({Key? key, required this.title}) : super(key: key);
 
   final String title;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<HomeScreen> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<HomeScreen> {
   int _selectedIndex = 0;
+  final pages = [Plan(), TasksPage()];
 
   void _onItemTapped(int index) {
     setState(() {
@@ -23,90 +26,97 @@ class _MyHomePageState extends State<MyHomePage> {
     if (index == 1) {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => ScheduleScreen()),
+        MaterialPageRoute(builder: (context) => const Authentication()),
       );
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black87,
       appBar: AppBar(
-        backgroundColor: Colors.black,
-        iconTheme: IconThemeData(color: Colors.white),
-        title: Text(
-          widget.title,
-          style: TextStyle(color: Colors.white),
+        backgroundColor: Colors.black54,
+        leading: Builder(
+          builder: (BuildContext context) {
+            return IconButton(
+              icon: const Icon(Icons.menu),
+              color: Colors.white,
+              onPressed: () {
+                Scaffold.of(context).openDrawer();
+              },
+            );
+          },
         ),
       ),
-      body: VerticalCardList(),
-
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.black,
+      body: Padding(
+        padding: const EdgeInsets.all(2),
+        child: pages[_selectedIndex],
+      ),
+      drawer: SafeArea(
+        child: Drawer(
+          backgroundColor: Colors.black87,
+          surfaceTintColor: Colors.white,
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              const Padding(
+                padding: EdgeInsets.all(10.0),
+                child: Text("Get It Done"),
               ),
-              child: Text('Get It Done', style: TextStyle(color: Colors.white)),
-            ),
-            ListTile(
-              title: Text('Home'),
-              selected: _selectedIndex == 0,
-              onTap: () {
-                _onItemTapped(0);
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: Text('Tasks'),
-              selected: _selectedIndex == 1,
-              onTap: () {
-                _onItemTapped(1);
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: Text('Settings'),
-              selected: _selectedIndex == 2,
-              onTap: () {
-                _onItemTapped(2);
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              title: Text('About'),
-              selected: _selectedIndex == 3,
-              onTap: () {
-                _onItemTapped(3);
-                Navigator.pop(context);
-              },
-            ),
-          ],
+              ListTile(
+                title: const Text('Get It Done'),
+                selected: _selectedIndex == 0,
+                onTap: () {
+                  _onItemTapped(0);
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.black,
-        selectedItemColor: Theme.of(context).colorScheme.secondary,
-        unselectedItemColor: Colors.white,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.lightbulb),
-            label: 'Plan',
+      bottomNavigationBar: Container(
+        decoration: const BoxDecoration(
+          color: Colors.transparent,
+        ),
+        child: Container(
+          width: MyConstants.screenWidth(context),
+          height: 100,
+          child: BottomNavigationBar(
+            type: BottomNavigationBarType.fixed,
+            useLegacyColorScheme: false,
+            backgroundColor: Colors.black87,
+            selectedItemColor: Colors.amber,
+            unselectedItemColor: Colors.grey,
+            iconSize: 30,
+            items: const [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.lightbulb_outline_rounded),
+                label: 'Plan',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.check_circle_outline_rounded),
+                label: 'Tasks',
+              ),
+            ],
+            currentIndex: _selectedIndex,
+            onTap: (index) {
+              setState(() {
+                _selectedIndex = index;
+              });
+            },
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_month),
-            label: 'Schedule',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.task_alt_rounded),
-            label: 'Tasks',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const NewEntry()),
+          );
+        },
+        child: const Icon(Icons.add),
       ),
     );
   }

@@ -1,17 +1,12 @@
 import 'package:flutter/material.dart';
 
-
-
-
-
 class LoginPage extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         body: Container(
-          margin: EdgeInsets.all(24),
+          margin: const EdgeInsets.all(24),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [

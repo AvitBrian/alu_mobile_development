@@ -1,23 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:get_it_done/features/navigation/screens/home_screen.dart';
+
+import 'features/authentication/authentication.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key});
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Get it Done!',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
-        useMaterial3: true,
-      ),
       debugShowCheckedModeBanner: false,
-      home: const MyHomePage(title: 'Get it Done!'),
+      home: const Authentication(),
+      theme: ThemeData(
+        primarySwatch: Colors.orange,
+      ),
     );
   }
 }
