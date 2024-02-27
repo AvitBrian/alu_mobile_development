@@ -45,7 +45,7 @@ class TasksPage extends StatelessWidget {
                         color: Colors.amberAccent.withOpacity(0.1),
                         spreadRadius: 3,
                         blurRadius: 7,
-                        offset: Offset(0, 3),
+                        offset: const Offset(0, 3),
                       ),
                     ],
                   ),

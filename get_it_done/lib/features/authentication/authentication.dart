@@ -54,7 +54,7 @@ class Authentication extends StatelessWidget {
                               overlayColor:
                                   MaterialStateProperty.all(Colors.transparent),
                             ),
-                            child: const Text("Register"),
+                            child: const Text("Sign up"),
                           )
                         ],
                       )

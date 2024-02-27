@@ -92,7 +92,8 @@ class _SignUpFormState extends State<SignUpForm> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(20.0),
+      padding: EdgeInsets.symmetric(
+          vertical: AppSettings.screenHeight(context) * .3, horizontal: 50),
       child: SizedBox(
         height: AppSettings.screenHeight(context),
         child: SingleChildScrollView(
@@ -105,7 +106,7 @@ class _SignUpFormState extends State<SignUpForm> {
                 style:
                     TextStyle(fontSize: 20, color: AppSettings.secondaryColor),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 1.0),
               TextField(
                 decoration: InputDecoration(
                   border: InputBorder.none,
@@ -117,6 +118,7 @@ class _SignUpFormState extends State<SignUpForm> {
                 ),
                 controller: usernameController,
               ),
+              const SizedBox(height: 1.0),
               TextField(
                 decoration: InputDecoration(
                   border: InputBorder.none,
@@ -128,6 +130,7 @@ class _SignUpFormState extends State<SignUpForm> {
                 ),
                 controller: emailController,
               ),
+              const SizedBox(height: 1.0),
               TextField(
                 decoration: InputDecoration(
                   border: InputBorder.none,

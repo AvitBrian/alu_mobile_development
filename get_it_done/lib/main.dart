@@ -21,15 +21,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Set system UI overlay style
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
+        systemNavigationBarIconBrightness: Brightness.light,
         statusBarColor: Colors.black,
         systemNavigationBarColor: Colors.black,
         statusBarIconBrightness: Brightness.light,
       ),
     );
-
     return ChangeNotifierProvider(
       create: (context) => AuthStateProvider(),
       child: MaterialApp(

@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it_done/features/navigation/widgets/plan_page.dart';
-import 'package:get_it_done/features/navigation/widgets/tasks_page.dart';
+import 'package:get_it_done/features/navigation/pages/plan_page.dart';
+import 'package:get_it_done/features/navigation/pages/tasks_page.dart';
 import 'package:get_it_done/utils/app_settings.dart';
 import 'package:provider/provider.dart';
 
@@ -18,8 +18,9 @@ class HomeScreen extends StatefulWidget {
 
 class _MyHomePageState extends State<HomeScreen> {
   int _selectedIndex = 0;
-  final pages = [Plan(), TasksPage()];
+  final pages = [Plan(), const TasksPage()];
 
+  //creating
   void _showAddTaskBottomSheet(BuildContext context) {
     String title = '';
     String imageUrl = '';
@@ -42,7 +43,7 @@ class _MyHomePageState extends State<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
+                  const Text(
                     'Add New Task',
                     style: TextStyle(
                       fontSize: 20.0,
@@ -50,9 +51,9 @@ class _MyHomePageState extends State<HomeScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 20.0),
+                  const SizedBox(height: 20.0),
                   TextField(
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Title',
                       border: OutlineInputBorder(),
                     ),
@@ -60,9 +61,9 @@ class _MyHomePageState extends State<HomeScreen> {
                       title = value;
                     },
                   ),
-                  SizedBox(height: 20.0),
+                  const SizedBox(height: 20.0),
                   TextField(
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'imageUrl',
                       border: OutlineInputBorder(),
                     ),
@@ -71,7 +72,7 @@ class _MyHomePageState extends State<HomeScreen> {
                       imageUrl = value;
                     },
                   ),
-                  SizedBox(height: 20.0),
+                  const SizedBox(height: 20.0),
                   ElevatedButton(
                     onPressed: () async {
                       if (title.isNotEmpty) {
@@ -88,17 +89,16 @@ class _MyHomePageState extends State<HomeScreen> {
                           'state': 'pending'
                         });
 
-                        // Close the bottom sheet
                         Navigator.pop(context);
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
+                          const SnackBar(
                             content: Text('Please enter title and details.'),
                           ),
                         );
                       }
                     },
-                    child: Text('Save'),
+                    child: const Text('Save'),
                   ),
                 ],
               ),

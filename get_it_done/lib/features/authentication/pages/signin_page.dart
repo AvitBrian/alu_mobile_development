@@ -83,7 +83,7 @@ class _SignInFormState extends State<SignInForm> {
     return SingleChildScrollView(
       child: Padding(
         padding: EdgeInsets.symmetric(
-            horizontal: 70.0, vertical: AppSettings.screenHeight(context) * .3),
+            horizontal: 50.0, vertical: AppSettings.screenHeight(context) * .3),
         child: Column(
           children: [
             Text(
@@ -97,31 +97,32 @@ class _SignInFormState extends State<SignInForm> {
                   filled: true,
                   fillColor: AppSettings.secondaryColor.withOpacity(.1),
                   hintText: "Email",
-                  hintStyle: TextStyle(color: Colors.grey),
-                  prefixIcon: Icon(Icons.person_2_outlined)),
+                  hintStyle: const TextStyle(color: Colors.grey),
+                  prefixIcon: const Icon(Icons.person_2_outlined)),
               controller: emailController,
             ),
-            const SizedBox(height: 16.0),
+            const SizedBox(height: 1.0),
             TextField(
               decoration: InputDecoration(
                   border: InputBorder.none,
                   filled: true,
                   fillColor: AppSettings.secondaryColor.withOpacity(.1),
                   hintText: "Password",
-                  hintStyle: TextStyle(color: Colors.grey),
-                  prefixIcon: Icon(Icons.lock_open_rounded)),
+                  hintStyle: const TextStyle(color: Colors.grey),
+                  prefixIcon: const Icon(Icons.lock_open_rounded)),
               controller: passwordController,
               obscureText: true,
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: () {},
-                  child: const Text("Forgot Password?"),
-                ),
-              ],
-            ),
+            const SizedBox(height: 10.0),
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.end,
+            //   children: [
+            //     TextButton(
+            //       onPressed: () {},
+            //       child: const Text("Forgot Password?"),
+            //     ),
+            //   ],
+            // ),
             Visibility(
               visible: hasError,
               child: SizedBox(

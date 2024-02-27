@@ -6,13 +6,13 @@ import 'package:provider/provider.dart';
 import '../../../providers/provider.dart';
 
 class Plan extends StatefulWidget {
-  Plan({Key? key}) : super(key: key);
+  const Plan({Key? key}) : super(key: key);
 
   @override
-  _PlanState createState() => _PlanState();
+  PlanState createState() => PlanState();
 }
 
-class _PlanState extends State<Plan> {
+class PlanState extends State<Plan> {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   late Stream<QuerySnapshot<Map<String, dynamic>>> _taskStream;
 
@@ -23,6 +23,7 @@ class _PlanState extends State<Plan> {
         _db.collection('Tasks').orderBy('date', descending: true).snapshots();
   }
 
+  //updating
   Future<void> _editTask(String taskId, String currentName) async {
     String newName = currentName;
 
@@ -51,7 +52,7 @@ class _PlanState extends State<Plan> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () async {
@@ -62,13 +63,13 @@ class _PlanState extends State<Plan> {
                   Navigator.of(context).pop();
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
+                    const SnackBar(
                       content: Text('Please enter a name.'),
                     ),
                   );
                 }
               },
-              child: Text('Save'),
+              child: const Text('Save'),
             ),
           ],
         );
@@ -76,6 +77,7 @@ class _PlanState extends State<Plan> {
     );
   }
 
+  //deleting
   Future<void> _deleteTask(String taskId) async {
     await _db.collection('Tasks').doc(taskId).delete();
   }
@@ -84,6 +86,7 @@ class _PlanState extends State<Plan> {
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthStateProvider>(context);
     return Center(
+      //reading
       child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
         stream: _taskStream,
         builder: (context, snapshot) {
@@ -204,18 +207,18 @@ class _PlanState extends State<Plan> {
                                           task["name"],
                                         );
                                       },
-                                      icon: Icon(
+                                      icon: const Icon(
                                         Icons.edit,
                                         color: Colors.grey,
                                       ),
                                     ),
-                                    SizedBox(width: 5),
+                                    const SizedBox(width: 5),
                                     IconButton(
                                       onPressed: () async {
                                         await _deleteTask(
                                             snapshot.data!.docs[index].id);
                                       },
-                                      icon: Icon(
+                                      icon: const Icon(
                                         Icons.delete_forever,
                                         color: Colors.grey,
                                       ),
