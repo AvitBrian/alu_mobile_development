@@ -26,7 +26,7 @@ class TasksPage extends StatelessWidget {
                   builder: (BuildContext context) {
                     return Container(
                         constraints: BoxConstraints(
-                            maxHeight: MyConstants.screenHeight(context) * 0.2),
+                            maxHeight: MyConstants.screenHeight(context) * 0.8),
                         child: Scaffold(
                           body: Center(
                               child: Text(" State ${tasks[index]["name"]}")),
@@ -51,11 +51,17 @@ class TasksPage extends StatelessWidget {
                                     width: MyConstants.screenWidth(context),
                                     child: Padding(
                                       padding: const EdgeInsets.all(8.0),
-                                      child:
-                                          Text("State ${tasks[index]["name"]}"),
+                                      child: Text(
+                                        "State ${tasks[index]["name"]}",
+                                        style: const TextStyle(
+                                            color: Colors.white),
+                                      ),
                                     ))),
                             Expanded(
-                                child: Text("Picture ${tasks[index]["name"]}")),
+                                child: Text(
+                              "Picture ${tasks[index]["name"]}",
+                              style: const TextStyle(color: Colors.white),
+                            )),
                             Expanded(
                               child: Container(
                                   decoration: const BoxDecoration(
@@ -73,13 +79,19 @@ class TasksPage extends StatelessWidget {
                                               width: MyConstants.screenWidth(
                                                   context),
                                               child: Text(
-                                                  "${tasks[index]["name"]} Details")),
+                                                "${tasks[index]["name"]} Details",
+                                                style: const TextStyle(
+                                                    color: Colors.white),
+                                              )),
                                         ),
-                                        Row(
+                                        const Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.end,
                                           children: [
-                                            Icon(Icons.check),
+                                            Icon(
+                                              Icons.check,
+                                              color: Colors.grey,
+                                            ),
                                           ],
                                         ),
                                       ],

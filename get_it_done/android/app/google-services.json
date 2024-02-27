@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "567683033096",
+    "project_id": "get-it-done-ab165",
+    "storage_bucket": "get-it-done-ab165.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:567683033096:android:1e37ce64db05d4935b49bd",
+        "android_client_info": {
+          "package_name": "com.alumobiledev.get_it_done"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAiD8UBTssCQstpPvjZ1HuasatW2b0TILU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

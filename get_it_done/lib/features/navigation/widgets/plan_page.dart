@@ -1,40 +1,100 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it_done/utils/constants.dart';
 
-class Plan extends StatelessWidget {
-  Plan({super.key});
+class Plan extends StatefulWidget {
+  Plan({Key? key}) : super(key: key);
 
-  final List<Map> tasks = List.generate(
-      5,
-      (index) => {
-            "id": index,
-            "name": "Task ${index + 1}",
-            "state": "",
-            "photoUrl": ""
-          });
+  @override
+  _PlanState createState() => _PlanState();
+}
+
+class _PlanState extends State<Plan> {
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  late Stream<QuerySnapshot<Map<String, dynamic>>> _taskStream;
+
+  @override
+  void initState() {
+    super.initState();
+    _taskStream =
+        _db.collection('Tasks').orderBy('date', descending: true).snapshots();
+  }
+
+  Future<void> _editTask(String taskId, String currentName) async {
+    String newName = currentName;
+
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Edit Task'),
+          content: TextField(
+            decoration: InputDecoration(labelText: 'Name'),
+            onChanged: (value) => newName = value,
+            controller: TextEditingController(text: currentName),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                if (newName.isNotEmpty) {
+                  await _db.collection('Tasks').doc(taskId).update({
+                    'name': newName,
+                  });
+                  Navigator.of(context).pop();
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Please enter a name.'),
+                    ),
+                  );
+                }
+              },
+              child: Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _deleteTask(String taskId) async {
+    await _db.collection('Tasks').doc(taskId).delete();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: ListView.builder(
-          itemCount: tasks.length,
-          itemBuilder: (context, index) {
-            return GestureDetector(
-              onTap: () {
-                showModalBottomSheet(
-                  isScrollControlled: true,
-                  builder: (BuildContext context) {
-                    return Container(
-                        constraints: BoxConstraints(
-                            maxHeight: MyConstants.screenHeight(context) * 0.2),
-                        child: Scaffold(
-                          body: Center(child: Text("${tasks[index]["name"]}")),
-                        ));
-                  },
-                  context: context,
-                );
-              },
-              child: Container(
+      child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+        stream: _taskStream,
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Center(
+              child: Text('Error: ${snapshot.error}'),
+            );
+          }
+
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
+          final tasks = snapshot.data!.docs.map((doc) => doc.data()).toList();
+
+          return ListView.builder(
+            itemCount: tasks.length,
+            itemBuilder: (context, index) {
+              final task = tasks[index];
+
+              return GestureDetector(
+                onTap: () {},
+                child: Container(
                   decoration: const BoxDecoration(
                     border: Border(
                       bottom: BorderSide(
@@ -54,86 +114,107 @@ class Plan extends StatelessWidget {
                           child: Container(
                             height: MyConstants.screenHeight(context),
                             decoration: BoxDecoration(
-                                color: Colors.blueGrey,
-                                borderRadius: BorderRadius.circular(5)),
+                              color: Colors.blueGrey,
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(5),
+                              child: Image.network(
+                                "${task["imageUrl"]}",
+                                fit: BoxFit.fill,
+                              ),
+                            ),
                           ),
                         ),
                       ),
                       Expanded(
                         flex: 3,
                         child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             Expanded(
-                                child: Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    const Expanded(
-                                      child: Icon(
-                                        Icons.check_circle_outline_rounded,
-                                        color: Colors.green,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      const Expanded(
+                                        child: Icon(
+                                          Icons.check_circle_outline_rounded,
+                                          color: Colors.green,
+                                        ),
                                       ),
-                                    ),
-                                    Expanded(
-                                      flex: 9,
-                                      child: Container(
+                                      Expanded(
+                                        flex: 10,
+                                        child: Container(
                                           decoration: const BoxDecoration(
-                                              borderRadius: BorderRadius.only(
-                                                  bottomLeft:
-                                                      Radius.circular(0),
-                                                  bottomRight:
-                                                      Radius.circular(0))),
-                                          width:
-                                              MyConstants.screenWidth(context),
+                                            borderRadius: BorderRadius.only(
+                                              bottomLeft: Radius.circular(0),
+                                              bottomRight: Radius.circular(0),
+                                            ),
+                                          ),
                                           child: Padding(
                                             padding: const EdgeInsets.symmetric(
-                                                vertical: 8.0),
-                                            child: Text(
-                                              "${tasks[index]["name"]}",
-                                              style: const TextStyle(
-                                                  color: Colors.white),
+                                              vertical: 3.0,
                                             ),
-                                          )),
-                                    ),
-                                  ],
-                                ),
-                                Expanded(
-                                  child: SizedBox(
-                                    width: MyConstants.screenWidth(context),
-                                    child: const Text(
-                                      "Important",
-                                      style: TextStyle(
-                                          fontSize: 8, color: Colors.white),
-                                    ),
-                                  ),
-                                )
-                              ],
-                            )),
-                            Container(
-                                decoration: const BoxDecoration(
-                                    borderRadius: BorderRadius.only(
-                                        bottomLeft: Radius.circular(0),
-                                        bottomRight: Radius.circular(0))),
-                                width: MyConstants.screenWidth(context),
-                                child: const Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Icon(
-                                        Icons.delete_forever,
-                                        color: Colors.grey,
+                                            child: Text(
+                                              "${task["name"]}",
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
                                       ),
                                     ],
                                   ),
-                                )),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    IconButton(
+                                      onPressed: () async {
+                                        await _editTask(
+                                          snapshot.data!.docs[index].id,
+                                          task["name"],
+                                        );
+                                      },
+                                      icon: Icon(
+                                        Icons.edit,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                    SizedBox(width: 5),
+                                    IconButton(
+                                      onPressed: () async {
+                                        await _deleteTask(
+                                            snapshot.data!.docs[index].id);
+                                      },
+                                      icon: Icon(
+                                        Icons.delete_forever,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ),
                     ],
-                  )),
-            );
-          }),
+                  ),
+                ),
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }

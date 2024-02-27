@@ -1,21 +1,47 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:get_it_done/features/authentication/authentication.dart';
+import 'package:get_it_done/providers/auth_provider.dart';
+import 'package:provider/provider.dart';
 
-import 'features/authentication/authentication.dart';
+import 'firebase_options.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: const Authentication(),
-      theme: ThemeData(
-        primarySwatch: Colors.orange,
+    // Set system UI overlay style
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.black,
+        systemNavigationBarColor: Colors.black,
+        statusBarIconBrightness: Brightness.light,
+      ),
+    );
+
+    return ChangeNotifierProvider(
+      create: (context) => AuthStateProvider(),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          // Set theme colors
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.amberAccent),
+          // Enable Material 3
+          useMaterial3: true,
+        ),
+        themeMode: ThemeMode.system,
+        home: const Authentication(),
       ),
     );
   }

@@ -1,6 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it_done/features/authentication/authentication.dart';
-import 'package:get_it_done/features/navigation/widgets/new_task.dart';
 import 'package:get_it_done/features/navigation/widgets/plan_page.dart';
 import 'package:get_it_done/features/navigation/widgets/tasks_page.dart';
 import 'package:get_it_done/utils/constants.dart';
@@ -29,6 +29,87 @@ class _MyHomePageState extends State<HomeScreen> {
         MaterialPageRoute(builder: (context) => const Authentication()),
       );
     }
+  }
+
+  void _showAddTaskBottomSheet(BuildContext context) {
+    String title = '';
+    String imageUrl = '';
+
+    showModalBottomSheet(
+      isScrollControlled: true,
+      context: context,
+      builder: (BuildContext context) {
+        return SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+            ),
+            child: Container(
+              padding: EdgeInsets.all(20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Add New Task',
+                    style: TextStyle(
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 20.0),
+                  TextField(
+                    decoration: InputDecoration(
+                      labelText: 'Title',
+                      border: OutlineInputBorder(),
+                    ),
+                    onChanged: (value) {
+                      title = value;
+                    },
+                  ),
+                  SizedBox(height: 20.0),
+                  TextField(
+                    decoration: InputDecoration(
+                      labelText: 'imageUrl',
+                      border: OutlineInputBorder(),
+                    ),
+                    maxLines: null,
+                    onChanged: (value) {
+                      imageUrl = value;
+                    },
+                  ),
+                  SizedBox(height: 20.0),
+                  ElevatedButton(
+                    onPressed: () async {
+                      if (title.isNotEmpty && imageUrl.isNotEmpty) {
+                        // Add task to Firebase
+                        await FirebaseFirestore.instance
+                            .collection('Tasks')
+                            .add({
+                          'name': title,
+                          'imageUrl': imageUrl,
+                          'date': DateTime.now(),
+                        });
+
+                        // Close the bottom sheet
+                        Navigator.pop(context);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Please enter title and details.'),
+                          ),
+                        );
+                      }
+                    },
+                    child: Text('Save'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -110,11 +191,9 @@ class _MyHomePageState extends State<HomeScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.orangeAccent,
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const NewEntry()),
-          );
+          _showAddTaskBottomSheet(context);
         },
         child: const Icon(Icons.add),
       ),
