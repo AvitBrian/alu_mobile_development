@@ -20,12 +20,6 @@ class _MyHomePageState extends State<HomeScreen> {
   int _selectedIndex = 0;
   final pages = [Plan(), TasksPage()];
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
   void _showAddTaskBottomSheet(BuildContext context) {
     String title = '';
     String imageUrl = '';
