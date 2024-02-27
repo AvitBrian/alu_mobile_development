@@ -1,108 +1,104 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it_done/utils/constants.dart';
+import 'package:get_it_done/utils/app_settings.dart';
+import 'package:provider/provider.dart';
+
+import '../../../providers/provider.dart';
 
 class TasksPage extends StatelessWidget {
-  TasksPage({super.key});
-
-  final List<Map> tasks = List.generate(
-      5,
-      (index) => {
-            "id": index,
-            "name": "Task ${index + 1}",
-            "state": "",
-            "photoUrl": ""
-          });
+  const TasksPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthStateProvider>(context);
+
     return Center(
-      child: ListView.builder(
-          itemCount: tasks.length,
-          itemBuilder: (context, index) {
-            return GestureDetector(
-              onTap: () {
-                showModalBottomSheet(
-                  isScrollControlled: true,
-                  builder: (BuildContext context) {
-                    return Container(
-                        constraints: BoxConstraints(
-                            maxHeight: MyConstants.screenHeight(context) * 0.8),
-                        child: Scaffold(
-                          body: Center(
-                              child: Text(" State ${tasks[index]["name"]}")),
-                        ));
-                  },
-                  context: context,
-                );
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(5.0),
-                child: Center(
-                    child: Container(
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                            color: Colors.black38),
-                        width: MyConstants.screenWidth(context),
-                        height: 300,
-                        child: Column(
+      child: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('Tasks')
+            .where('uid', isEqualTo: authProvider.currentUser?.uid)
+            .where('state', isEqualTo: 'pending')
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return CircularProgressIndicator();
+          }
+          if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}');
+          }
+
+          final tasks = snapshot.data!.docs;
+
+          return ListView.builder(
+            itemCount: tasks.length,
+            itemBuilder: (context, index) {
+              final task = tasks[index].data() as Map<String, dynamic>;
+
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: Colors.black,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.amberAccent.withOpacity(0.1),
+                        spreadRadius: 3,
+                        blurRadius: 7,
+                        offset: Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          "${task["name"]}",
+                          style: TextStyle(
+                            color: AppSettings.textColor,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        width: AppSettings.screenWidth(context),
+                        height: AppSettings.screenHeight(context) / 3,
+                        child: Image.network(
+                          "${task["imageUrl"]}",
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            Expanded(
-                                child: Container(
-                                    width: MyConstants.screenWidth(context),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Text(
-                                        "State ${tasks[index]["name"]}",
-                                        style: const TextStyle(
-                                            color: Colors.white),
-                                      ),
-                                    ))),
-                            Expanded(
-                                child: Text(
-                              "Picture ${tasks[index]["name"]}",
-                              style: const TextStyle(color: Colors.white),
-                            )),
-                            Expanded(
-                              child: Container(
-                                  decoration: const BoxDecoration(
-                                      color: Colors.black26,
-                                      borderRadius: BorderRadius.only(
-                                          bottomLeft: Radius.circular(5),
-                                          bottomRight: Radius.circular(5))),
-                                  width: MyConstants.screenWidth(context),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Column(
-                                      children: [
-                                        Expanded(
-                                          child: SizedBox(
-                                              width: MyConstants.screenWidth(
-                                                  context),
-                                              child: Text(
-                                                "${tasks[index]["name"]} Details",
-                                                style: const TextStyle(
-                                                    color: Colors.white),
-                                              )),
-                                        ),
-                                        const Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.end,
-                                          children: [
-                                            Icon(
-                                              Icons.check,
-                                              color: Colors.grey,
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  )),
+                            IconButton(
+                              onPressed: () {
+                                FirebaseFirestore.instance
+                                    .collection('Tasks')
+                                    .doc(tasks[index].id)
+                                    .update({'state': 'done'});
+                              },
+                              icon: Icon(
+                                Icons.check,
+                                color: Colors.grey,
+                              ),
                             ),
                           ],
-                        ))),
-              ),
-            );
-          }),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }

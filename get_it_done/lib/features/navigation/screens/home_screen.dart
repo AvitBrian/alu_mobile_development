@@ -1,9 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it_done/features/authentication/authentication.dart';
 import 'package:get_it_done/features/navigation/widgets/plan_page.dart';
 import 'package:get_it_done/features/navigation/widgets/tasks_page.dart';
-import 'package:get_it_done/utils/constants.dart';
+import 'package:get_it_done/utils/app_settings.dart';
+import 'package:provider/provider.dart';
+
+import '../../../providers/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key, required this.title}) : super(key: key);
@@ -22,20 +24,16 @@ class _MyHomePageState extends State<HomeScreen> {
     setState(() {
       _selectedIndex = index;
     });
-
-    if (index == 1) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const Authentication()),
-      );
-    }
   }
 
   void _showAddTaskBottomSheet(BuildContext context) {
     String title = '';
     String imageUrl = '';
+    final authProvider = Provider.of<AuthStateProvider>(context, listen: false);
 
     showModalBottomSheet(
+      backgroundColor: AppSettings.primaryColor,
+      useSafeArea: true,
       isScrollControlled: true,
       context: context,
       builder: (BuildContext context) {
@@ -54,6 +52,7 @@ class _MyHomePageState extends State<HomeScreen> {
                     'Add New Task',
                     style: TextStyle(
                       fontSize: 20.0,
+                      color: Colors.amber,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -81,14 +80,18 @@ class _MyHomePageState extends State<HomeScreen> {
                   SizedBox(height: 20.0),
                   ElevatedButton(
                     onPressed: () async {
-                      if (title.isNotEmpty && imageUrl.isNotEmpty) {
+                      if (title.isNotEmpty) {
                         // Add task to Firebase
                         await FirebaseFirestore.instance
                             .collection('Tasks')
                             .add({
                           'name': title,
-                          'imageUrl': imageUrl,
+                          'imageUrl': imageUrl == ''
+                              ? 'https://t3.ftcdn.net/jpg/02/48/42/64/240_F_248426448_NVKLywWqArG2ADUxDq6QprtIzsF82dMF.jpg'
+                              : imageUrl,
                           'date': DateTime.now(),
+                          'uid': authProvider.currentUser?.uid,
+                          'state': 'pending'
                         });
 
                         // Close the bottom sheet
@@ -115,54 +118,18 @@ class _MyHomePageState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black87,
+      backgroundColor: AppSettings.primaryColor,
       appBar: AppBar(
-        backgroundColor: Colors.black54,
-        leading: Builder(
-          builder: (BuildContext context) {
-            return IconButton(
-              icon: const Icon(Icons.menu),
-              color: Colors.white,
-              onPressed: () {
-                Scaffold.of(context).openDrawer();
-              },
-            );
-          },
-        ),
+        backgroundColor: AppSettings.secondaryColor,
+        title: Text(widget.title),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(2),
-        child: pages[_selectedIndex],
-      ),
-      drawer: SafeArea(
-        child: Drawer(
-          backgroundColor: Colors.black87,
-          surfaceTintColor: Colors.white,
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: [
-              const Padding(
-                padding: EdgeInsets.all(10.0),
-                child: Text("Get It Done"),
-              ),
-              ListTile(
-                title: const Text('Get It Done'),
-                selected: _selectedIndex == 0,
-                onTap: () {
-                  _onItemTapped(0);
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          ),
-        ),
-      ),
+      body: pages[_selectedIndex],
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
           color: Colors.transparent,
         ),
         child: Container(
-          width: MyConstants.screenWidth(context),
+          width: AppSettings.screenWidth(context),
           height: 100,
           child: BottomNavigationBar(
             type: BottomNavigationBarType.fixed,
@@ -191,7 +158,6 @@ class _MyHomePageState extends State<HomeScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.orangeAccent,
         onPressed: () {
           _showAddTaskBottomSheet(context);
         },

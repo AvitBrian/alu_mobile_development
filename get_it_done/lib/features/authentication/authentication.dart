@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it_done/features/authentication/pages/signin_page.dart';
 import 'package:get_it_done/features/authentication/pages/signup_page.dart';
-import 'package:get_it_done/providers/auth_provider.dart';
-import 'package:get_it_done/utils/constants.dart';
+import 'package:get_it_done/providers/provider.dart';
+import 'package:get_it_done/utils/app_settings.dart';
 import 'package:provider/provider.dart';
 
 class Authentication extends StatelessWidget {
@@ -13,24 +13,24 @@ class Authentication extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: MyConstants.backgroundColor,
-      systemNavigationBarColor: MyConstants.backgroundColor,
+      statusBarColor: AppSettings.backgroundColor,
+      systemNavigationBarColor: AppSettings.backgroundColor,
       systemNavigationBarIconBrightness: Brightness.dark,
       statusBarIconBrightness: Brightness.dark,
     ));
     final authStateProvider = Provider.of<AuthStateProvider>(context);
 
     return Scaffold(
-      backgroundColor: MyConstants.backgroundColor,
+      backgroundColor: AppSettings.backgroundColor,
       body: SafeArea(
         child: SizedBox(
-          height: MyConstants.screenHeight(context),
-          width: MyConstants.screenWidth(context),
+          height: AppSettings.screenHeight(context),
+          width: AppSettings.screenWidth(context),
           child: Column(children: [
             Expanded(
                 flex: 10,
                 child: SizedBox(
-                    width: MyConstants.screenWidth(context),
+                    width: AppSettings.screenWidth(context),
                     child: SingleChildScrollView(
                       child: authStateProvider.signedState
                           ? const SignInForm()
@@ -39,14 +39,14 @@ class Authentication extends StatelessWidget {
             Expanded(
               child: Container(
                 alignment: Alignment.bottomCenter,
-                width: MyConstants.screenWidth(context),
+                width: AppSettings.screenWidth(context),
                 child: authStateProvider.signedState
                     ? Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
                             "Not a Member?",
-                            style: TextStyle(color: MyConstants.textColor),
+                            style: TextStyle(color: AppSettings.textColor),
                           ),
                           TextButton(
                             onPressed: authStateProvider.toggleSigned,
@@ -63,7 +63,7 @@ class Authentication extends StatelessWidget {
                         children: [
                           Text(
                             "Already a member?",
-                            style: TextStyle(color: MyConstants.textColor),
+                            style: TextStyle(color: AppSettings.textColor),
                           ),
                           TextButton(
                             onPressed: authStateProvider.toggleSigned,

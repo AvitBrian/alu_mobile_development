@@ -1,6 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:get_it_done/utils/constants.dart';
+import 'package:get_it_done/utils/app_settings.dart';
+import 'package:provider/provider.dart';
+
+import '../../../providers/provider.dart';
 
 class Plan extends StatefulWidget {
   Plan({Key? key}) : super(key: key);
@@ -27,9 +30,19 @@ class _PlanState extends State<Plan> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('Edit Task'),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(3),
+          ),
+          backgroundColor: AppSettings.primaryColor,
+          title: Text(
+            'Edit Task',
+            style: TextStyle(color: AppSettings.secondaryColor),
+          ),
           content: TextField(
-            decoration: InputDecoration(labelText: 'Name'),
+            decoration: InputDecoration(
+                labelText: 'Name',
+                filled: true,
+                fillColor: Colors.grey.withOpacity(.5)),
             onChanged: (value) => newName = value,
             controller: TextEditingController(text: currentName),
           ),
@@ -69,6 +82,7 @@ class _PlanState extends State<Plan> {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthStateProvider>(context);
     return Center(
       child: StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
         stream: _taskStream,
@@ -85,7 +99,11 @@ class _PlanState extends State<Plan> {
             );
           }
 
-          final tasks = snapshot.data!.docs.map((doc) => doc.data()).toList();
+          final tasks = snapshot.data!.docs
+              .where(
+                  (doc) => doc.data()['uid'] == authProvider.currentUser!.uid)
+              .map((doc) => doc.data())
+              .toList();
 
           return ListView.builder(
             itemCount: tasks.length,
@@ -104,7 +122,7 @@ class _PlanState extends State<Plan> {
                       ),
                     ),
                   ),
-                  width: MyConstants.screenWidth(context),
+                  width: AppSettings.screenWidth(context),
                   height: 100,
                   child: Row(
                     children: [
@@ -112,7 +130,7 @@ class _PlanState extends State<Plan> {
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Container(
-                            height: MyConstants.screenHeight(context),
+                            height: AppSettings.screenHeight(context),
                             decoration: BoxDecoration(
                               color: Colors.blueGrey,
                               borderRadius: BorderRadius.circular(5),
@@ -138,10 +156,12 @@ class _PlanState extends State<Plan> {
                                 children: [
                                   Row(
                                     children: [
-                                      const Expanded(
+                                      Expanded(
                                         child: Icon(
                                           Icons.check_circle_outline_rounded,
-                                          color: Colors.green,
+                                          color: task["state"] == "pending"
+                                              ? Colors.amberAccent
+                                              : Colors.green,
                                         ),
                                       ),
                                       Expanded(

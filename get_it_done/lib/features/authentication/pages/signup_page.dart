@@ -1,161 +1,185 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it_done/features/navigation/screens/home_screen.dart';
-import 'package:get_it_done/providers/auth_provider.dart';
-import 'package:get_it_done/utils/constants.dart';
+import 'package:get_it_done/providers/provider.dart';
+import 'package:get_it_done/utils/app_settings.dart';
 import 'package:provider/provider.dart';
 
-class SignUpForm extends StatelessWidget {
+class SignUpForm extends StatefulWidget {
   const SignUpForm({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthStateProvider>(context);
-    final TextEditingController _emailController = TextEditingController();
-    final TextEditingController _passwordController = TextEditingController();
-    final TextEditingController _usernameController = TextEditingController();
-    bool _isLoading = false;
-    bool _hasError = false;
-    String _error = '';
+  _SignUpFormState createState() => _SignUpFormState();
+}
 
-    Future<void> handleSignUp() async {
-      final email = _emailController.text.trim();
-      final password = _passwordController.text.trim();
-      final username = _usernameController.text.trim();
+class _SignUpFormState extends State<SignUpForm> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController usernameController = TextEditingController();
+  bool isLoading = false;
+  bool hasError = false;
+  String error = '';
 
-      if (email.isEmpty || password.isEmpty || username.isEmpty) {
-        _hasError = true;
-        _error = 'Fill in all fields';
+  Future<bool> checkUserExists(String email) async {
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('email', isEqualTo: email)
+          .limit(1)
+          .get();
+      return snapshot.docs.isNotEmpty;
+    } catch (e) {
+      print('Error checking user existence: $e');
+      return false;
+    }
+  }
+
+  Future<void> handleSignUp() async {
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+    final username = usernameController.text.trim();
+
+    if (email.isEmpty || password.isEmpty || username.isEmpty) {
+      setState(() {
+        hasError = true;
+        error = 'Fill in all fields';
+      });
+      return;
+    }
+
+    try {
+      setState(() {
+        isLoading = true;
+      });
+
+      final userExists = await checkUserExists(email);
+      if (userExists) {
+        setState(() {
+          hasError = true;
+          error = 'User already exists with this email.';
+          isLoading = false;
+        });
         return;
       }
 
-      try {
-        _isLoading = true;
-        await authProvider.signUp(email, password, username);
-        final currentUser = authProvider.currentUser;
+      final authProvider =
+          Provider.of<AuthStateProvider>(context, listen: false);
+      await authProvider.signUp(email, password, username);
+      final currentUser = authProvider.currentUser;
 
-        if (currentUser != null) {
-          await FirebaseFirestore.instance.collection("users").add({
-            "name": username,
-            "email": currentUser.email,
-            "uid": currentUser.uid,
-            "photoUrl": null,
-          });
-          authProvider.setAuthState(currentUser);
-          _isLoading = false;
-          handleAfterSignUp(context);
-        }
-      } on FirebaseAuthException catch (e) {
-        _hasError = true;
-        switch (e.code) {
-          case 'user-not-found':
-            _error = 'User not found. Please check your email.';
-            break;
-          case 'wrong-password':
-            _error = 'Incorrect password. Please try again.';
-            break;
-          case 'invalid-email':
-            _error = 'Invalid email. Please try again.';
-            break;
-          default:
-            _error = 'An unexpected error occurred. Please try again.';
-            break;
-        }
-      } catch (e) {
-        _hasError = true;
-        _error = 'An unexpected error occurred. Please try again.';
-      } finally {
-        _isLoading = false;
+      if (currentUser != null) {
+        await FirebaseFirestore.instance.collection("users").add({
+          "name": username,
+          "email": currentUser.email,
+          "uid": currentUser.uid,
+          "photoUrl": null,
+        });
+        authProvider.setAuthState(currentUser);
+        setState(() {
+          isLoading = false;
+        });
+        handleAfterSignUp(context);
       }
+    } catch (e) {
+      setState(() {
+        hasError = true;
+        error = 'An unexpected error occurred. Please try again.';
+        isLoading = false;
+      });
     }
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: SizedBox(
-        height: MyConstants.screenHeight(context),
+        height: AppSettings.screenHeight(context),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 16.0),
-              const Text(
-                "Let's Sign You Up!",
-                style: TextStyle(fontSize: 14),
+              Text(
+                "Sign Up",
+                style:
+                    TextStyle(fontSize: 20, color: AppSettings.secondaryColor),
               ),
               const SizedBox(height: 8),
               TextField(
                 decoration: InputDecoration(
-                  hintText: _hasError ? _error : 'Username',
-                  hintStyle: TextStyle(color: Colors.grey[500]),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(color: Colors.white),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(4),
-                    borderSide: BorderSide(color: Colors.grey.shade400),
-                  ),
-                  fillColor: Colors.grey.shade200,
+                  border: InputBorder.none,
                   filled: true,
+                  fillColor: AppSettings.secondaryColor.withOpacity(0.1),
+                  hintText: 'Username',
+                  hintStyle: const TextStyle(color: Colors.grey),
+                  prefixIcon: const Icon(Icons.person_outline),
                 ),
-                controller: _usernameController,
+                controller: usernameController,
               ),
               TextField(
                 decoration: InputDecoration(
-                  hintText: _hasError ? _error : 'Email',
-                  hintStyle: TextStyle(color: Colors.grey[500]),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(color: Colors.white),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(4),
-                    borderSide: BorderSide(color: Colors.grey.shade400),
-                  ),
-                  fillColor: Colors.grey.shade200,
+                  border: InputBorder.none,
                   filled: true,
+                  fillColor: AppSettings.secondaryColor.withOpacity(0.1),
+                  hintText: 'Email',
+                  hintStyle: const TextStyle(color: Colors.grey),
+                  prefixIcon: const Icon(Icons.email_outlined),
                 ),
-                controller: _emailController,
+                controller: emailController,
               ),
               TextField(
                 decoration: InputDecoration(
-                  hintText: _hasError ? _error : "Password",
-                  hintStyle: TextStyle(color: Colors.grey[500]),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: const BorderSide(color: Colors.white),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(4),
-                    borderSide: BorderSide(color: Colors.grey.shade400),
-                  ),
-                  fillColor: Colors.grey.shade200,
+                  border: InputBorder.none,
                   filled: true,
+                  fillColor: AppSettings.secondaryColor.withOpacity(0.1),
+                  hintText: 'Password',
+                  hintStyle: const TextStyle(color: Colors.grey),
+                  prefixIcon: const Icon(Icons.lock_outline),
                 ),
-                controller: _passwordController,
+                controller: passwordController,
                 obscureText: true,
               ),
-              const SizedBox(height: 8),
-              MaterialButton(
-                onPressed: handleSignUp,
-                child: Text("Register"),
-              ),
-              if (_isLoading)
-                Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: MyConstants.secondaryColor,
-                  ),
-                  height: 76,
-                  width: MyConstants.screenWidth(context),
-                  child: const Center(
-                    child: CircularProgressIndicator(
-                      color: Colors.amber,
-                      strokeWidth: 5,
-                    ),
+              const SizedBox(height: 16.0),
+              Visibility(
+                visible: hasError,
+                child: SizedBox(
+                  height: 50,
+                  child: Text(
+                    error,
+                    style: const TextStyle(color: Colors.red),
                   ),
                 ),
+              ),
+              Stack(
+                children: [
+                  Container(
+                    color: Colors.orangeAccent,
+                    width: AppSettings.screenWidth(context),
+                    height: 45,
+                    child: MaterialButton(
+                      onPressed: handleSignUp,
+                      color: AppSettings.secondaryColor,
+                      child: const Text("Sign Up"),
+                    ),
+                  ),
+                  if (isLoading)
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: AppSettings.secondaryColor,
+                      ),
+                      height: 76,
+                      width: AppSettings.screenWidth(context),
+                      child: const Center(
+                        child: CircularProgressIndicator(
+                          color: Colors.orangeAccent,
+                          strokeWidth: 5,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
             ],
           ),
         ),
