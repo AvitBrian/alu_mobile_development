@@ -12,7 +12,12 @@
           "package_name": "com.alumobiledev.get_it_done"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "567683033096-1lsq2u8f8o65u8ku14jb6io8ae3hl7l0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAiD8UBTssCQstpPvjZ1HuasatW2b0TILU"
@@ -20,7 +25,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "567683033096-1lsq2u8f8o65u8ku14jb6io8ae3hl7l0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "567683033096-4uliflku1u20dlu595c7sv3senl46rtc.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.alumobiledev.getItDone"
+              }
+            }
+          ]
         }
       }
     }
