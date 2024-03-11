@@ -24,21 +24,7 @@ class AuthStateProvider extends ChangeNotifier {
     // checkAuthState();
   }
 
-  Future<void> checkAuthState() async {
-    try {
-      _currentUser = _auth.currentUser;
-      _isLoggedIn = _currentUser != null;
-      if (_isLoggedIn) {
-        _uid = _currentUser!.uid;
-      }
-    } catch (e) {
-      _isLoggedIn = false;
-      throw ('Error checking authentication state: $e');
-    }
-
-    notifyListeners();
-  }
-
+  
   Future<void> setAuthState(User? user) async {
     _isLoggedIn = true;
     _currentUser = user;

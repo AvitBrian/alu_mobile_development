@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it_done/features/navigation/screens/home_screen.dart';
 import 'package:get_it_done/providers/provider.dart';
 import 'package:get_it_done/utils/app_settings.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 
 class SignInForm extends StatefulWidget {
@@ -15,13 +16,56 @@ class SignInForm extends StatefulWidget {
 class _SignInFormState extends State<SignInForm> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+
   bool isLoading = false;
   bool hasError = false;
   String error = '';
 
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
+
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthStateProvider>(context);
+    Future<void> handleGoogleSignIn() async {
+      try {
+        setState(() {
+          isLoading = true;
+          hasError = false;
+        });
+
+        final GoogleSignInAccount? googleSignInAccount =
+            await _googleSignIn.signIn();
+
+        if (googleSignInAccount != null) {
+          final GoogleSignInAuthentication googleSignInAuthentication =
+              await googleSignInAccount.authentication;
+
+          final OAuthCredential credential = GoogleAuthProvider.credential(
+            accessToken: googleSignInAuthentication.accessToken,
+            idToken: googleSignInAuthentication.idToken,
+          );
+
+          await FirebaseAuth.instance.signInWithCredential(credential);
+
+          authProvider.setAuthState(FirebaseAuth.instance.currentUser);
+
+          handleAfterLogin(context);
+        } else {
+          setState(() {
+            isLoading = false;
+            hasError = true;
+            error = 'Google sign-in cancelled.';
+          });
+        }
+      } catch (e) {
+        setState(() {
+          isLoading = false;
+          hasError = true;
+          error = '${e.toString()}';
+          print("$e");
+        });
+      }
+    }
 
     Future<void> handleEmailAndPasswordSignIn() async {
       final email = emailController.text.trim();
@@ -71,11 +115,12 @@ class _SignInFormState extends State<SignInForm> {
               break;
           }
         });
-      } catch (_) {
+      } catch (e) {
+        print("Error details: $e");
         setState(() {
           isLoading = false;
           hasError = true;
-          error = 'An unexpected error occurred. Please try again.';
+          error = 'Error occurred during Google sign-in. Please try again.';
         });
       }
     }
@@ -114,15 +159,6 @@ class _SignInFormState extends State<SignInForm> {
               obscureText: true,
             ),
             const SizedBox(height: 10.0),
-            // Row(
-            //   mainAxisAlignment: MainAxisAlignment.end,
-            //   children: [
-            //     TextButton(
-            //       onPressed: () {},
-            //       child: const Text("Forgot Password?"),
-            //     ),
-            //   ],
-            // ),
             Visibility(
               visible: hasError,
               child: SizedBox(
@@ -162,7 +198,37 @@ class _SignInFormState extends State<SignInForm> {
                   ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: handleGoogleSignIn,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                  ),
+                  child: const Row(
+                    children: [
+                      Icon(
+                        Icons.gpp_good,
+                        color: Colors.black,
+                      ),
+                      SizedBox(width: 10),
+                      Text(
+                        "Continue with Google",
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),

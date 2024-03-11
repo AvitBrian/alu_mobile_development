@@ -20,6 +20,9 @@ class _SignUpFormState extends State<SignUpForm> {
   bool hasError = false;
   String error = '';
 
+  
+  
+
   Future<bool> checkUserExists(String email) async {
     try {
       final snapshot = await FirebaseFirestore.instance
