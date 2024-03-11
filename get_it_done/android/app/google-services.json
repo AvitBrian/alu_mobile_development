@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "567683033096-ul6n4kp169k9jammi60418hf489sa0ao.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.alumobiledev.get_it_done",
+            "certificate_hash": "b29d9477b50eae4c0d8b0d0df979c3983368d98e"
+          }
+        },
+        {
           "client_id": "567683033096-1lsq2u8f8o65u8ku14jb6io8ae3hl7l0.apps.googleusercontent.com",
           "client_type": 3
         }
