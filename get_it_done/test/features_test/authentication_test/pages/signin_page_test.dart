@@ -2,44 +2,76 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it_done/features/authentication/pages/signin_page.dart';
 import 'package:get_it_done/providers/provider.dart';
+import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
 
-class AuthStateProviderMock extends AuthStateProvider {
-  // Override methods here if needed
-}
+class MockAuthStateProvider extends Mock implements AuthStateProvider {}
 
 void main() {
-  group('SignInForm methods', () {
-    testWidgets('handleGoogleSignIn - Test', (WidgetTester tester) async {
+  group('SignInForm', () {
+    late MockAuthStateProvider mockAuthProvider;
+
+    setUp(() {
+      mockAuthProvider = MockAuthStateProvider();
+    });
+
+    testWidgets('Renders UI widgets', (WidgetTester tester) async {
       await tester.pumpWidget(
         Provider<AuthStateProvider>(
-          create: (_) => AuthStateProviderMock(),
+          create: (_) => mockAuthProvider,
           child: MaterialApp(home: SignInForm()),
         ),
       );
 
-      // Trigger the handleGoogleSignIn
+      expect(find.text('GET IT DONE!'), findsOneWidget);
+      expect(find.byType(TextField), findsNWidgets(2));
+      expect(find.byType(TextButton), findsOneWidget);
+      expect(find.byType(ElevatedButton), findsOneWidget);
+    });
+
+    testWidgets('Email and Password are required', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        Provider<AuthStateProvider>(
+          create: (_) => mockAuthProvider,
+          child: MaterialApp(home: SignInForm()),
+        ),
+      );
+
       await tester.tap(find.byType(ElevatedButton));
       await tester.pump();
 
-      // Verify that the handleGoogleSignIn button was tapped
-      expect(find.text('Google Sign In'), findsOneWidget);
+      expect(find.text('Email and Password Required!'), findsOneWidget);
     });
 
-    testWidgets('handleEmailAndPasswordSignIn - Test', (WidgetTester tester) async {
+    testWidgets('Google sign in button works', (WidgetTester tester) async {
       await tester.pumpWidget(
         Provider<AuthStateProvider>(
-          create: (_) => AuthStateProviderMock(),
+          create: (_) => mockAuthProvider,
           child: MaterialApp(home: SignInForm()),
         ),
       );
 
-      // Trigger the handleEmailAndPasswordSignIn
+      await tester.tap(find.byType(ElevatedButton));
+      await tester.pump();
+
+      verify(mockAuthProvider.setAuthState(any)).called(1);
+    });
+
+    testWidgets('Email and Password sign in button works', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        Provider<AuthStateProvider>(
+          create: (_) => mockAuthProvider,
+          child: MaterialApp(home: SignInForm()),
+        ),
+      );
+
+      await tester.enterText(find.byType(TextField).first, 'test@example.com');
+      await tester.enterText(find.byType(TextField).last, 'password123');
+
       await tester.tap(find.byType(TextButton));
       await tester.pump();
 
-      // Verify that the handleEmailAndPasswordSignIn button was tapped
-      expect(find.text('Email Sign In'), findsOneWidget);
+      verify(mockAuthProvider.signInWithEmailAndPassword(any, any)).called(1);
     });
   });
 }
