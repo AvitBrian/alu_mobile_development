@@ -4,10 +4,12 @@ import 'package:get_it_done/features/authentication/pages/signin_page.dart';
 import 'package:get_it_done/providers/provider.dart';
 import 'package:provider/provider.dart';
 
+class AuthStateProviderMock extends AuthStateProvider {
+}
+
 void main() {
   group('SignInForm methods', () {
     testWidgets('handleGoogleSignIn - Test', (WidgetTester tester) async {
-      // Wrap SignInForm with Provider<AuthStateProvider>
       await tester.pumpWidget(
         Provider<AuthStateProvider>(
           create: (_) => AuthStateProviderMock(),
@@ -24,7 +26,6 @@ void main() {
     });
 
     testWidgets('handleEmailAndPasswordSignIn - Test', (WidgetTester tester) async {
-      // Wrap SignInForm with Provider<AuthStateProvider>
       await tester.pumpWidget(
         Provider<AuthStateProvider>(
           create: (_) => AuthStateProviderMock(),
