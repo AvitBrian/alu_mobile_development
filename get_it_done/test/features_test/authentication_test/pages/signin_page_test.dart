@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get_it_done/features/authentication/widgets/signin_form.dart';
+import 'package:get_it_done/features/authentication/pages/signin_page.dart';
 
 void main() {
   testWidgets('Sign in form UI test', (WidgetTester tester) async {
