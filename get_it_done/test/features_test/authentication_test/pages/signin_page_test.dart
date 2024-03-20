@@ -9,7 +9,7 @@ void main() {
       await tester.pumpWidget(MaterialApp(home: SignInForm()));
 
       // Trigger the handleGoogleSignIn
-      await tester.tap(find.byType(ElevatedButton));
+      await tester.tap(find.text('Google Sign In'));
       await tester.pump();
 
       // Verify that the handleGoogleSignIn button was tapped
@@ -21,7 +21,7 @@ void main() {
       await tester.pumpWidget(MaterialApp(home: SignInForm()));
 
       // Trigger the handleEmailAndPasswordSignIn
-      await tester.tap(find.byType(MaterialButton));
+      await tester.tap(find.text('Email Sign In'));
       await tester.pump();
 
       // Verify that the handleEmailAndPasswordSignIn button was tapped
