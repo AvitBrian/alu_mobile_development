@@ -5,6 +5,7 @@ import 'package:get_it_done/providers/provider.dart';
 import 'package:provider/provider.dart';
 
 class AuthStateProviderMock extends AuthStateProvider {
+  // Override methods here if needed
 }
 
 void main() {
