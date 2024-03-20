@@ -3,9 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
 class AuthStateProvider extends ChangeNotifier {
-  late final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  late bool _isLoggedIn = false;
+  bool _isLoggedIn = false;
   bool _isSignedUp = true;
   bool _hasError = false;
   String? _errorCode;
@@ -24,13 +24,10 @@ class AuthStateProvider extends ChangeNotifier {
     // checkAuthState();
   }
 
-  
   Future<void> setAuthState(User? user) async {
     _isLoggedIn = true;
     _currentUser = user;
-    if (_currentUser != null) {
-      _uid = _currentUser!.uid;
-    }
+    _uid = _currentUser?.uid;
     notifyListeners();
   }
 
@@ -55,10 +52,10 @@ class AuthStateProvider extends ChangeNotifier {
       }
 
       setAuthState(_currentUser);
-      notifyListeners();
     } on FirebaseAuthException catch (e) {
       _hasError = true;
       _errorCode = e.message;
+    } finally {
       notifyListeners();
     }
   }
@@ -71,13 +68,11 @@ class AuthStateProvider extends ChangeNotifier {
       UserCredential userCredential = await _auth.signInWithEmailAndPassword(
           email: userEmail, password: userPassword);
       _currentUser = userCredential.user;
-      if (_currentUser != null) {
-        _uid = _currentUser!.uid;
-      }
-      notifyListeners();
+      _uid = _currentUser?.uid;
     } on FirebaseAuthException catch (e) {
       _hasError = true;
       _errorCode = e.message;
+    } finally {
       notifyListeners();
     }
   }
@@ -111,11 +106,12 @@ class AuthStateProvider extends ChangeNotifier {
       await _auth.signOut();
       _isLoggedIn = false;
       _uid = null;
-      notifyListeners();
     } catch (e) {
       if (kDebugMode) {
         print('Error signing out: $e');
       }
+    } finally {
+      notifyListeners();
     }
   }
 }
