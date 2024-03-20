@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_it_done/providers/provider.dart';
-import 'package:get_it_done/features/authentication/widgets/signin_form.dart';
+import 'package:get_it_done/features/authentication/pages/signin_page.dart';
 
 void main() {
   runApp(
