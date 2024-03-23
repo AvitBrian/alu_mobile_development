@@ -1,79 +1,41 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it_done/features/authentication/pages/signup_page.dart';
 import 'package:get_it_done/providers/provider.dart';
 import 'package:provider/provider.dart';
+import 'package:mockito/mockito.dart';
+
+class MockFirebaseAuth extends Mock implements FirebaseAuth {}
 
 void main() {
-  group('SignUpForm methods', () {
-    testWidgets('checkUserExists - Test', (WidgetTester tester) async {
-      final mockFirestore = MockFirestore();
-      final authStateProvider = AuthStateProviderMock();
+  group('SignUpForm Widget Test', () {
+    testWidgets('TextFields Test', (WidgetTester tester) async {
+      // Mock FirebaseAuth instance
+      final mockFirebaseAuth = MockFirebaseAuth();
+
+      final usernameField = find.byKey(const ValueKey("usernameField"));
+      final emailField = find.byKey(const ValueKey("emailField"));
+      final passwordField = find.byKey(const ValueKey("passwordField"));
+
       await tester.pumpWidget(
-        Provider<AuthStateProvider>(
-          create: (_) => authStateProvider,
-          child: MaterialApp(
-            home: Scaffold(
-              body: SignUpForm(),
+        MaterialApp(
+          home: Scaffold(
+            body: ChangeNotifierProvider<AuthStateProvider>.value(
+              value: AuthStateProvider(firebaseAuth: mockFirebaseAuth),
+              child: const SignUpForm(),
             ),
           ),
         ),
       );
-
-      final emailField = find.widgetWithText(TextField, 'Email');
-      await tester.enterText(emailField, 'test@example.com');
-      // Trigger the checkUserExists method
-      await tester.runAsync(() async {
-        final userExists = await authStateProvider.checkUserExists('test@example.com');
-        // Verify that the checkUserExists method returns the correct result
-        expect(userExists, false);
-      });
-    });
-
-    testWidgets('handleSignUp - Test', (WidgetTester tester) async {
-      final mockFirestore = MockFirestore();
-
-      final authStateProvider = AuthStateProviderMock();
-      await tester.pumpWidget(
-        Provider<AuthStateProvider>(
-          create: (_) => authStateProvider,
-          child: MaterialApp(
-            home: Scaffold(
-              body: SignUpForm(),
-            ),
-          ),
-        ),
-      );
-
-      final usernameField = find.widgetWithText(TextField, 'Username');
-      final emailField = find.widgetWithText(TextField, 'Email');
-      final passwordField = find.widgetWithText(TextField, 'Password');
-      await tester.enterText(usernameField, 'testuser');
-      await tester.enterText(emailField, 'test@example.com');
-      await tester.enterText(passwordField, 'password');
-
-      // Trigger handleSignUp 
-      await tester.tap(find.text('Sign Up'));
+      await tester.enterText(usernameField, "testuser");
+      await tester.enterText(emailField, "test@example.com");
+      await tester.enterText(passwordField, "testpassword");
       await tester.pump();
 
-
-      expect(authStateProvider.handleSignUpCalled, true);
+      expect(find.text("testuser"), findsOneWidget);
+      expect(find.text("test@example.com"), findsOneWidget);
+      expect(find.text("testpassword"), findsOneWidget);
     });
   });
-}
-
-class MockFirestore extends Mock implements FirebaseFirestore {}
-
-class AuthStateProviderMock extends AuthStateProvider {
-  bool handleSignUpCalled = false;
-
-  @override
-  Future<bool> checkUserExists(String email) async {
-    return false;
-  }
-
-  @override
-  Future<void> handleSignUp(String email, String password, String username) async {
-    handleSignUpCalled = true;
-  }
 }

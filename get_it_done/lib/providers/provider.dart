@@ -3,8 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
 class AuthStateProvider extends ChangeNotifier {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-
+   final FirebaseAuth _auth;
   bool _isLoggedIn = false;
   bool _isSignedUp = true;
   bool _hasError = false;
@@ -20,9 +19,8 @@ class AuthStateProvider extends ChangeNotifier {
   String? get errorCode => _errorCode;
   String? get uid => _uid;
 
-  AuthStateProvider() {
-    // checkAuthState();
-  }
+  AuthStateProvider({FirebaseAuth? firebaseAuth})
+      : _auth = firebaseAuth ?? FirebaseAuth.instance;
 
   Future<void> setAuthState(User? user) async {
     _isLoggedIn = true;
@@ -114,4 +112,7 @@ class AuthStateProvider extends ChangeNotifier {
       notifyListeners();
     }
   }
+  //testing:
+
+  
 }

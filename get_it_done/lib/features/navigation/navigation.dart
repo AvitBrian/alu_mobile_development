@@ -8,7 +8,7 @@ class Navigation extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Scaffold(
       body: Center(
-        child: HomeScreen(title: "Get It done"),
+        child: HomeScreen(title: "Get It done", key: ValueKey("homeScreenKey"),),
       ),
     );
   }

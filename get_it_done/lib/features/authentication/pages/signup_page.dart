@@ -20,9 +20,6 @@ class _SignUpFormState extends State<SignUpForm> {
   bool hasError = false;
   String error = '';
 
-  
-  
-
   Future<bool> checkUserExists(String email) async {
     try {
       final snapshot = await FirebaseFirestore.instance
@@ -111,6 +108,7 @@ class _SignUpFormState extends State<SignUpForm> {
               ),
               const SizedBox(height: 1.0),
               TextField(
+                key: const ValueKey('usernameField'), // Add key here
                 decoration: InputDecoration(
                   border: InputBorder.none,
                   filled: true,
@@ -123,6 +121,7 @@ class _SignUpFormState extends State<SignUpForm> {
               ),
               const SizedBox(height: 1.0),
               TextField(
+                key: const ValueKey('emailField'), // Add key here
                 decoration: InputDecoration(
                   border: InputBorder.none,
                   filled: true,
@@ -135,6 +134,7 @@ class _SignUpFormState extends State<SignUpForm> {
               ),
               const SizedBox(height: 1.0),
               TextField(
+                key: const ValueKey('passwordField'), // Add key here
                 decoration: InputDecoration(
                   border: InputBorder.none,
                   filled: true,

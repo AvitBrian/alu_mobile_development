@@ -7,7 +7,7 @@ import 'package:get_it_done/utils/app_settings.dart';
 import 'package:provider/provider.dart';
 
 class Authentication extends StatelessWidget {
-  const Authentication({super.key});
+  const Authentication({Key? key}) : super(key: key);
   static bool isLoading = false;
 
   @override
@@ -28,14 +28,16 @@ class Authentication extends StatelessWidget {
           width: AppSettings.screenWidth(context),
           child: Column(children: [
             Expanded(
-                flex: 10,
-                child: SizedBox(
-                    width: AppSettings.screenWidth(context),
-                    child: SingleChildScrollView(
-                      child: authStateProvider.signedState
-                          ? const SignInForm()
-                          : const SignUpForm(),
-                    ))),
+              flex: 10,
+              child: SizedBox(
+                width: AppSettings.screenWidth(context),
+                child: SingleChildScrollView(
+                  child: authStateProvider.signedState
+                      ? const SignInForm(key: Key('signInForm'))
+                      : const SignUpForm(key: Key('signUpForm')),
+                ),
+              ),
+            ),
             Expanded(
               child: Container(
                 alignment: Alignment.bottomCenter,
@@ -46,9 +48,11 @@ class Authentication extends StatelessWidget {
                         children: [
                           Text(
                             "Not a Member?",
+                            key:const Key('notAMemberText'),
                             style: TextStyle(color: AppSettings.textColor),
                           ),
                           TextButton(
+                            key: const Key('signUpButton'),
                             onPressed: authStateProvider.toggleSigned,
                             style: ButtonStyle(
                               overlayColor:
@@ -63,6 +67,7 @@ class Authentication extends StatelessWidget {
                         children: [
                           Text(
                             "Already a member?",
+                            key: const Key('alreadyAMemberText'),
                             style: TextStyle(color: AppSettings.textColor),
                           ),
                           TextButton(
@@ -71,7 +76,7 @@ class Authentication extends StatelessWidget {
                               overlayColor:
                                   MaterialStateProperty.all(Colors.transparent),
                             ),
-                            child: const Text("Log in!"),
+                            child: const Text("Log in!", key: Key('logInButton')),
                           )
                         ],
                       ),

@@ -1,50 +1,39 @@
-
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it_done/features/authentication/pages/signin_page.dart';
 import 'package:get_it_done/providers/provider.dart';
-import 'package:mockito/annotations.dart';
-import 'package:mockito/mockito.dart';
 import 'package:provider/provider.dart';
+import 'package:mockito/mockito.dart';
 
-import 'signin_page_test.mocks.dart';
+class MockFirebaseAuth extends Mock implements FirebaseAuth {}
 
-@GenerateMocks([AuthStateProvider])
+
 void main() {
-  group('SignInForm Widget Tests', () {
-    late MockAuthStateProvider mockAuthStateProvider;
+  group('SignInForm Widget Test', () {
+    testWidgets('TextFields Test', (WidgetTester tester) async {
+      // Mock FirebaseAuth instance
+      final mockFirebaseAuth = MockFirebaseAuth();
 
-    setUp(() {
-      mockAuthStateProvider = MockAuthStateProvider();
-    });
+      final emailField = find.byKey(const ValueKey("emailField"));
+      final passwordField = find.byKey(const ValueKey("passwordField"));
 
-    testWidgets('Email and Password Fields are present', (WidgetTester tester) async {
-      // Build the SignInForm widget with the mock AuthStateProvider
       await tester.pumpWidget(
-        Provider<AuthStateProvider>(
-          create: (_) => mockAuthStateProvider,
-          child: const MaterialApp(home: SignInForm()),
+        MaterialApp(
+          home: Scaffold(
+            body: ChangeNotifierProvider<AuthStateProvider>.value(
+              value: AuthStateProvider(firebaseAuth: mockFirebaseAuth),
+              child: const SignInForm(),
+            ),
+          ),
         ),
       );
+      await tester.enterText(emailField, "user");
+      await tester.enterText(passwordField, "password");
+      await tester.pump();
 
-      final emailField = find.byKey(const Key('email_field'));
-      final passwordField = find.byKey(const Key('password_field'));
-
-      expect(emailField, findsOneWidget);
-      expect(passwordField, findsOneWidget);
-    });
-
-    testWidgets('Sign in button is present', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        Provider<AuthStateProvider>(
-          create: (_) => mockAuthStateProvider,
-          child: const MaterialApp(home: SignInForm()),
-        ),
-      );
-
-      final signInButton = find.byKey(const Key('sign_in_button'));
-
-      expect(signInButton, findsOneWidget);
+      expect(find.text("user"), findsOneWidget);
+      expect(find.text("password"), findsOneWidget);
     });
   });
 }

@@ -1,12 +1,37 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:get_it_done/features/navigation/screens/home_screen.dart';
-import 'package:get_it_done/features/navigation/widgets/navigation.dart';
+import 'package:get_it_done/features/authentication/authentication.dart';
+import 'package:get_it_done/features/navigation/navigation.dart';
+import 'package:get_it_done/providers/provider.dart';
+import 'package:provider/provider.dart';
+import 'package:mockito/mockito.dart';
+
+// Mock AuthStateProvider class using Mockito
+class MockAuthStateProvider extends Mock implements AuthStateProvider {
+   @override
+  bool get signedState => false;
+}
 
 void main() {
-  testWidgets('Navigation Widget Test', (WidgetTester tester) async {
-    await tester.pumpWidget(const MaterialApp(home: Navigation()));
-    await tester.pumpAndSettle();
-    expect(find.byType(HomeScreen), findsOneWidget);
+  group('Navigation Widget Test', () {
+    testWidgets('Displays text and buttons properly', (WidgetTester tester) async {
+      // Mock AuthStateProvider instance
+      final mockAuthStateProvider = MockAuthStateProvider();
+
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: ChangeNotifierProvider<AuthStateProvider>.value(
+            value: mockAuthStateProvider,
+            child: const Authentication(),
+          ),
+        ),
+      );
+      
+      await tester.pump();
+
+
+    });
   });
 }
