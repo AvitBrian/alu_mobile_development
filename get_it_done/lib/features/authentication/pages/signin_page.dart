@@ -134,17 +134,29 @@ class _SignInFormState extends State<SignInForm> {
           key: formKey,
           child: Column(
             children: [
+              Image.asset(
+                    'assets/logo.png',
+                    width: 70,
+                    height: 70,
+                  ),
+                  const SizedBox(width: 12),
               Text(
-                "GET IT DONE!",
+                "GetItDone!",
                 style: TextStyle(fontSize: 26, color: AppSettings.secondaryColor),
               ),
               const SizedBox(height: 8),
+              Text(
+                "Track one-time and recurring tasks with ease.",
+                style: TextStyle(fontSize: 19, color: AppSettings.secondaryColor),
+              ),
+                          const SizedBox(height: 12),
+
               TextFormField(
                 key: const Key('emailField'),
                 decoration: InputDecoration(
                     border: InputBorder.none,
                     filled: true,
-                    fillColor: AppSettings.secondaryColor.withOpacity(.1),
+                    fillColor: AppSettings.secondaryColor.withOpacity(.2),
                     hintText: "Email",
                     hintStyle: const TextStyle(color: Colors.grey),
                     prefixIcon: const Icon(Icons.person_2_outlined)),
@@ -162,10 +174,11 @@ class _SignInFormState extends State<SignInForm> {
                 decoration: InputDecoration(
                     border: InputBorder.none,
                     filled: true,
-                    fillColor: AppSettings.secondaryColor.withOpacity(.1),
+                    fillColor: AppSettings.secondaryColor.withOpacity(.2),
                     hintText: "Password",
                     hintStyle: const TextStyle(color: Colors.grey),
                     prefixIcon: const Icon(Icons.lock_open_rounded)),
+                  
                 controller: passwordController,
                 obscureText: true,
                 validator: (value) {
@@ -259,7 +272,7 @@ class _SignInFormState extends State<SignInForm> {
         context,
         MaterialPageRoute(
           builder: (BuildContext context) =>
-              const HomeScreen(title: "Get it Done"),
+              const HomeScreen(title: "GetItDone"),
         ),
       ),
     );

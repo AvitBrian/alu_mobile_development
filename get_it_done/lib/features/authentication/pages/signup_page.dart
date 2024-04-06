@@ -101,18 +101,30 @@ class _SignUpFormState extends State<SignUpForm> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 16.0),
+              Image.asset(
+                    'assets/logo.png',
+                    width: 70,
+                    height: 70,
+                  ),
+                  const SizedBox(width: 12),
               Text(
-                "Sign Up",
-                style:
-                    TextStyle(fontSize: 20, color: AppSettings.secondaryColor),
+                "GetItDone!",
+                style: TextStyle(fontSize: 26, color: AppSettings.secondaryColor),
               ),
+              const SizedBox(height: 8),
+              Text(
+                "Track one-time and recurring tasks with ease.",
+                style: TextStyle(fontSize: 19, color: AppSettings.secondaryColor),
+              ),
+                          const SizedBox(height: 12),
+              
               const SizedBox(height: 1.0),
               TextField(
                 key: const ValueKey('usernameField'), // Add key here
                 decoration: InputDecoration(
                   border: InputBorder.none,
                   filled: true,
-                  fillColor: AppSettings.secondaryColor.withOpacity(0.1),
+                  fillColor: AppSettings.secondaryColor.withOpacity(0.2),
                   hintText: 'Username',
                   hintStyle: const TextStyle(color: Colors.grey),
                   prefixIcon: const Icon(Icons.person_outline),
@@ -125,7 +137,7 @@ class _SignUpFormState extends State<SignUpForm> {
                 decoration: InputDecoration(
                   border: InputBorder.none,
                   filled: true,
-                  fillColor: AppSettings.secondaryColor.withOpacity(0.1),
+                  fillColor: AppSettings.secondaryColor.withOpacity(0.2),
                   hintText: 'Email',
                   hintStyle: const TextStyle(color: Colors.grey),
                   prefixIcon: const Icon(Icons.email_outlined),
@@ -138,7 +150,7 @@ class _SignUpFormState extends State<SignUpForm> {
                 decoration: InputDecoration(
                   border: InputBorder.none,
                   filled: true,
-                  fillColor: AppSettings.secondaryColor.withOpacity(0.1),
+                  fillColor: AppSettings.secondaryColor.withOpacity(0.2),
                   hintText: 'Password',
                   hintStyle: const TextStyle(color: Colors.grey),
                   prefixIcon: const Icon(Icons.lock_outline),
@@ -166,9 +178,9 @@ class _SignUpFormState extends State<SignUpForm> {
                     child: MaterialButton(
                       onPressed: handleSignUp,
                       color: AppSettings.secondaryColor,
-                      child: const Text("Sign Up"),
+                      child: const Text("Sign Up", style: TextStyle(color: Colors.black),
                     ),
-                  ),
+                  ),),
                   if (isLoading)
                     Container(
                       decoration: BoxDecoration(
@@ -199,7 +211,7 @@ class _SignUpFormState extends State<SignUpForm> {
         context,
         MaterialPageRoute(
           builder: (BuildContext context) => const HomeScreen(
-            title: "Get It Done",
+            title: "GetItDone",
           ),
         ),
       ),
